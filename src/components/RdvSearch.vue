@@ -1,11 +1,15 @@
 <!-- RdvSearch.vue -->
 <script setup>
     import * as dayjs from 'dayjs'
+    import * as utc from 'dayjs/plugin/utc'
     import 'dayjs/locale/fr' // import locale
     import RdvResults from './RdvResults.vue'
     import {DsfrButton} from '@gouvminint/vue-dsfr'
+    import {findMeetingPointName, getAvailableTimeSlots} from '../utils'
+    import axios from 'axios';
 
     dayjs.locale('fr')
+    dayjs.extend(utc)
 </script>
 
 <script>
@@ -16,41 +20,97 @@
                 end_date: "",
                 reason: "CNI",
                 documents_number: 1,
-                results: {
-                    "2023-04-26": [
+                results: null
+            }
+        },
+        methods: {
+            search: function(e) {
+                e.preventDefault();
+
+                getAvailableTimeSlots(this.start_date, this.end_date, this.reason, this.documents_number)
+                .then(response => {
+                    console.log(response)
+                })
+                .catch(function (error) {
+                    console.error(error);
+                });
+                // appel API
+                // then
+                let response = {
+                    "guid-1":[
                         {
-                            "meeting_point": "Mairie de Paris",
-                            "start_date": "2023-04-26T10:00:00Z",
+                            "datetime": "2023-05-26T10:00:00Z",
                             "url": "https://www.google.fr"
                         },
                         {
-                            "meeting_point": "Mairie de Paris",
-                            "start_date": "2023-04-26T11:00:00Z",
+                            "datetime": "2023-05-26T11:00:00Z",
                             "url": "https://www.google.fr"
                         },
                         {
-                            "meeting_point": "Mairie de Paris",
-                            "start_date": "2023-04-26T12:00:00Z",
+                            "datetime": "2023-05-26T12:00:00Z",
+                            "url": "https://www.google.fr"
+                        },
+                        {
+                            "datetime": "2023-05-27T10:00:00Z",
+                            "url": "https://www.google.fr"
+                        },
+                        {
+                            "datetime": "2023-05-27T11:00:00Z",
+                            "url": "https://www.google.fr"
+                        },
+                        {
+                            "datetime": "2023-05-27T12:00:00Z",
                             "url": "https://www.google.fr"
                         }
                     ],
-                    "2023-04-27": [
+                    "guid-2":[
                         {
-                            "meeting_point": "Mairie de Paris",
-                            "start_date": "2023-04-27T10:00:00Z",
+                            "datetime": "2023-05-26T09:00:00Z",
                             "url": "https://www.google.fr"
                         },
                         {
-                            "meeting_point": "Mairie de Paris",
-                            "start_date": "2023-04-27T11:00:00Z",
+                            "datetime": "2023-05-26T09:30:00Z",
                             "url": "https://www.google.fr"
                         },
                         {
-                            "meeting_point": "Mairie de Paris",
-                            "start_date": "2023-04-27T12:00:00Z",
+                            "datetime": "2023-05-26T10:00:00Z",
+                            "url": "https://www.google.fr"
+                        },
+                        {
+                            "datetime": "2023-05-27T09:00:00Z",
+                            "url": "https://www.google.fr"
+                        },
+                        {
+                            "datetime": "2023-05-27T09:30:00Z",
+                            "url": "https://www.google.fr"
+                        },
+                        {
+                            "datetime": "2023-05-27T10:00:00Z",
                             "url": "https://www.google.fr"
                         }
                     ]
+                };
+
+                this.results = {};
+
+                for (const key in response) {
+                    if (Object.hasOwnProperty.call(response, key)) {
+                        const appointments = response[key];
+                        
+                        for (const appointment of appointments) {
+                            let date = dayjs.utc(appointment.datetime).format("YYYY-MM-DD");
+
+                            if (this.results[date] == null) {
+                                this.results[date] = [];
+                            }
+
+                            this.results[date].push({
+                                meeting_point: findMeetingPointName(key),
+                                datetime: appointment.datetime,
+                                callback_url: appointment.callback_url
+                            })
+                        }
+                    }
                 }
             }
         }
@@ -119,12 +179,12 @@
                 </div>
                     <div class="fr-grid-row fr-grid-row--center">
                         <div class="fr-col fr-col-md-3 fr-col-lg-2 fr-col-xl-2">
-                            <DsfrButton label="Recherche" icon="ri-search-line" :disabled="!(start_date.length > 0 && end_date.length > 0)"/>
+                            <DsfrButton label="Recherche" icon="ri-search-line" :disabled="!(start_date.length > 0 && end_date.length > 0)" :onClick="search"/>
                         </div>
                     </div>
                 </div>
             </div>
         </form>
-        <RdvResults v-if="Object.keys(results).length > 0" :results="results" :start_date="start_date" :end_date="end_date"/>
+        <RdvResults v-if="results != null && Object.keys(results).length > 0" :results="results" :start_date="start_date" :end_date="end_date"/>
     </div>
 </template>

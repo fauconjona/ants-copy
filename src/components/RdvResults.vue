@@ -8,6 +8,19 @@ dayjs.locale('fr')
 dayjs.extend(utc)
 </script>
 
+<!--
+    Results:
+    {
+        'YYYY-MM-DD': [
+            {
+                meeting_point: "Nom",
+                datetime: "utc",
+                callback_url: "url"
+            }
+        ]
+    }
+-->
+
 <script>
     export default {
         data() {
@@ -84,7 +97,7 @@ dayjs.extend(utc)
                             </ul>
                             <DsfrTabContent v-for="(value, key) in results" :panel-id="'panel-'+key" :tab-id="'tab-'+key" :selected="key == current" asc>
                                 <DsfrTable
-                                    :rows='value.map(r => [r.meeting_point, dayjs.utc(r.start_date).format("HH:mm"), {"component":"DsfrButton","label":"Réserver","onClick": (e => changeLocation(r.url))}])'
+                                    :rows='value.map(r => [r.meeting_point, dayjs.utc(r.datetime).format("HH:mm"), {"component":"DsfrButton","label":"Réserver","onClick": (e => changeLocation(r.callback_url))}])'
                                 />
                             </DsfrTabContent>
                         </div>

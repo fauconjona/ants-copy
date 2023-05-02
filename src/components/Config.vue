@@ -23,7 +23,10 @@ import {DsfrInput, DsfrButton} from '@gouvminint/vue-dsfr'
                 localStorage.setItem("meeting_points", JSON.stringify(this.meeting_points));
             },
             add() {
-                this.meeting_points.push("");
+                this.meeting_points.push({
+                    guid: '',
+                    name: ''
+                });
             },
             remove(index) {
                 this.meeting_points.splice(index, 1);
@@ -48,9 +51,16 @@ import {DsfrInput, DsfrButton} from '@gouvminint/vue-dsfr'
     <br>
     <div>
         <h5>Lieux:</h5>
-        <DsfrInput v-for="(value, key) of meeting_points" :labelVisible="true" v-model:modelValue="meeting_points[key]">
-            <template #label><DsfrButton class="button" label="Supprimer" :onClick="(e => remove(key))"/></template>
-        </DsfrInput>
+        <div v-for="(value, key) of meeting_points">
+            <DsfrInput :labelVisible="true" v-model:modelValue="meeting_points[key].name">
+                <template #label>Nom</template>
+            </DsfrInput>
+            <DsfrInput :labelVisible="true" v-model:modelValue="meeting_points[key].guid">
+                <template #label>Guid</template>
+            </DsfrInput>
+            <DsfrButton class="button" label="Supprimer" :onClick="(e => remove(key))"/>
+        </div>
+        
         <DsfrButton class="button" label="Ajouter un lieu" :onClick="(e => add())"/>
     </div>
     <br>
