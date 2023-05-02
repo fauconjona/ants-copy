@@ -6,7 +6,6 @@
     import RdvResults from './RdvResults.vue'
     import {DsfrButton} from '@gouvminint/vue-dsfr'
     import {findMeetingPointName, getAvailableTimeSlots} from '../utils'
-    import axios from 'axios';
 
     dayjs.locale('fr')
     dayjs.extend(utc)
@@ -29,89 +28,35 @@
 
                 getAvailableTimeSlots(this.start_date, this.end_date, this.reason, this.documents_number)
                 .then(response => {
-                    console.log(response)
+                    return response.json();
+                })
+                .then(body => {
+                    console.log("Result", body);
+                    this.results = {};
+
+                    for (const key in body) {
+                        if (Object.hasOwnProperty.call(body, key)) {
+                            const appointments = body[key];
+                            
+                            for (const appointment of appointments) {
+                                let date = dayjs.utc(appointment.datetime).format("YYYY-MM-DD");
+
+                                if (this.results[date] == null) {
+                                    this.results[date] = [];
+                                }
+
+                                this.results[date].push({
+                                    meeting_point: findMeetingPointName(key),
+                                    datetime: appointment.datetime,
+                                    callback_url: appointment.callback_url
+                                })
+                            }
+                        }
+                    }
                 })
                 .catch(function (error) {
                     console.error(error);
                 });
-                // appel API
-                // then
-                let response = {
-                    "guid-1":[
-                        {
-                            "datetime": "2023-05-26T10:00:00Z",
-                            "url": "https://www.google.fr"
-                        },
-                        {
-                            "datetime": "2023-05-26T11:00:00Z",
-                            "url": "https://www.google.fr"
-                        },
-                        {
-                            "datetime": "2023-05-26T12:00:00Z",
-                            "url": "https://www.google.fr"
-                        },
-                        {
-                            "datetime": "2023-05-27T10:00:00Z",
-                            "url": "https://www.google.fr"
-                        },
-                        {
-                            "datetime": "2023-05-27T11:00:00Z",
-                            "url": "https://www.google.fr"
-                        },
-                        {
-                            "datetime": "2023-05-27T12:00:00Z",
-                            "url": "https://www.google.fr"
-                        }
-                    ],
-                    "guid-2":[
-                        {
-                            "datetime": "2023-05-26T09:00:00Z",
-                            "url": "https://www.google.fr"
-                        },
-                        {
-                            "datetime": "2023-05-26T09:30:00Z",
-                            "url": "https://www.google.fr"
-                        },
-                        {
-                            "datetime": "2023-05-26T10:00:00Z",
-                            "url": "https://www.google.fr"
-                        },
-                        {
-                            "datetime": "2023-05-27T09:00:00Z",
-                            "url": "https://www.google.fr"
-                        },
-                        {
-                            "datetime": "2023-05-27T09:30:00Z",
-                            "url": "https://www.google.fr"
-                        },
-                        {
-                            "datetime": "2023-05-27T10:00:00Z",
-                            "url": "https://www.google.fr"
-                        }
-                    ]
-                };
-
-                this.results = {};
-
-                for (const key in response) {
-                    if (Object.hasOwnProperty.call(response, key)) {
-                        const appointments = response[key];
-                        
-                        for (const appointment of appointments) {
-                            let date = dayjs.utc(appointment.datetime).format("YYYY-MM-DD");
-
-                            if (this.results[date] == null) {
-                                this.results[date] = [];
-                            }
-
-                            this.results[date].push({
-                                meeting_point: findMeetingPointName(key),
-                                datetime: appointment.datetime,
-                                callback_url: appointment.callback_url
-                            })
-                        }
-                    }
-                }
             }
         }
     }

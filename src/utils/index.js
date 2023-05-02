@@ -1,5 +1,3 @@
-import axios from "axios";
-
 export function findMeetingPointName(guid) {
     let meetingPoints = JSON.parse(localStorage.getItem("meeting_points")) ?? [];
     let item = meetingPoints.find(m => m.guid == guid);
@@ -23,29 +21,11 @@ export function getAvailableTimeSlots(start_date, end_date, reason, documents_nu
     
     console.log("GET", get_url);
 
-    const instance = axios.create({
-        https: {
-            checkServerIdentity: (host, cert) => {
-                // Customize certificate verification here, returning an error if the
-                // certificate is invalid or should not be trusted.
-            }
-        },
-        validateStatus: status => {
-            // Only reject responses with status codes outside the 2xx range
-            return status >= 200 && status < 300;
-        }
-    });
-
     let config = {
-        method: 'GET',
         headers: {
-            "x-hub-rdv-auth-token": token,
-            "Access-Control-Allow-Origin": "*"
-        },
-        mode: "cors"
+            "x-hub-rdv-auth-token": token
+        }
     }
-
-    console.log(config);
 
     return fetch(get_url, config);
 }
