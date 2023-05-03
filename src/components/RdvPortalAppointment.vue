@@ -1,7 +1,3 @@
-<script setup>
-    import RdvSearch from './RdvSearch.vue'
-</script>
-
 <template>
     <div>
         <main role="main" id="contenu">
@@ -11,3 +7,8 @@
         </main>
     </div>
 </template>
+
+<script setup>
+    import RdvSearch from './RdvSearch.vue'
+</script>
+

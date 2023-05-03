@@ -29,3 +29,26 @@ export function getAvailableTimeSlots(start_date, end_date, reason, documents_nu
 
     return fetch(get_url, config);
 }
+
+export function searchApplicationId(applicationId) {
+    let url = localStorage.getItem("api_url") ?? "";
+    let token = localStorage.getItem("token") ?? "";
+
+    if (url.length == 0 || token.length == 0) {
+        console.log("URL", url);
+        console.log("Token", token);
+        throw "Configuration incorrecte";
+    }
+
+    let get_url = `${url}/searchApplicationIds?application_ids=${applicationId}`;
+
+    console.log("GET", get_url);
+
+    let config = {
+        headers: {
+            "x-hub-rdv-auth-token": token
+        }
+    }
+
+    return fetch(get_url, config);
+}

@@ -4,12 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build --base=/ants-integration/",
     "preview": "vite preview"
   },
   "dependencies": {
     "@gouvminint/vue-dsfr": "^3.5.0",
-    "dayjs": "^1.11.7",
     "vue": "^3.2.47"
   },
   "devDependencies": {

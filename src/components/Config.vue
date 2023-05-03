@@ -1,3 +1,30 @@
+
+<template>
+    <DsfrInput :labelVisible="true" v-model:modelValue="api_url">
+        <template #label>Url de l'api</template>
+    </DsfrInput>
+    <DsfrInput :labelVisible="true" v-model:modelValue="token">
+        <template #label>Token</template>
+    </DsfrInput>
+    <br>
+    <div>
+        <h5>Lieux:</h5>
+        <div v-for="(value, key) of meeting_points">
+            <DsfrInput :labelVisible="true" v-model:modelValue="meeting_points[key].name">
+                <template #label>Nom</template>
+            </DsfrInput>
+            <DsfrInput :labelVisible="true" v-model:modelValue="meeting_points[key].guid">
+                <template #label>Guid</template>
+            </DsfrInput>
+            <DsfrButton class="button" label="Supprimer" :onClick="(e => remove(key))"/>
+        </div>
+        
+        <DsfrButton class="button" label="Ajouter un lieu" :onClick="(e => add())"/>
+    </div>
+    <br>
+    <DsfrButton class="button" label="Enregistrer" :onClick="(e => save())"/>
+</template>
+
 <script setup>
 import {DsfrInput, DsfrButton} from '@gouvminint/vue-dsfr'
 </script>
@@ -40,29 +67,3 @@ import {DsfrInput, DsfrButton} from '@gouvminint/vue-dsfr'
         margin-top: 16px;
     }
 </style>
-
-<template>
-    <DsfrInput :labelVisible="true" v-model:modelValue="api_url">
-        <template #label>Url de l'api</template>
-    </DsfrInput>
-    <DsfrInput :labelVisible="true" v-model:modelValue="token">
-        <template #label>Token</template>
-    </DsfrInput>
-    <br>
-    <div>
-        <h5>Lieux:</h5>
-        <div v-for="(value, key) of meeting_points">
-            <DsfrInput :labelVisible="true" v-model:modelValue="meeting_points[key].name">
-                <template #label>Nom</template>
-            </DsfrInput>
-            <DsfrInput :labelVisible="true" v-model:modelValue="meeting_points[key].guid">
-                <template #label>Guid</template>
-            </DsfrInput>
-            <DsfrButton class="button" label="Supprimer" :onClick="(e => remove(key))"/>
-        </div>
-        
-        <DsfrButton class="button" label="Ajouter un lieu" :onClick="(e => add())"/>
-    </div>
-    <br>
-    <DsfrButton class="button" label="Enregistrer" :onClick="(e => save())"/>
-</template>

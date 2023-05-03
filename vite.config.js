@@ -10,5 +10,9 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
+  },
+  build: {
+     target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
+     minify: false
   }
 })

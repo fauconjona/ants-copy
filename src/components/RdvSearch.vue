@@ -1,67 +1,4 @@
 <!-- RdvSearch.vue -->
-<script setup>
-    import * as dayjs from 'dayjs'
-    import * as utc from 'dayjs/plugin/utc'
-    import 'dayjs/locale/fr' // import locale
-    import RdvResults from './RdvResults.vue'
-    import {DsfrButton} from '@gouvminint/vue-dsfr'
-    import {findMeetingPointName, getAvailableTimeSlots} from '../utils'
-
-    dayjs.locale('fr')
-    dayjs.extend(utc)
-</script>
-
-<script>
-    export default {
-        data() {
-            return {
-                start_date: "",
-                end_date: "",
-                reason: "CNI",
-                documents_number: 1,
-                results: null
-            }
-        },
-        methods: {
-            search: function(e) {
-                e.preventDefault();
-
-                getAvailableTimeSlots(this.start_date, this.end_date, this.reason, this.documents_number)
-                .then(response => {
-                    return response.json();
-                })
-                .then(body => {
-                    console.log("Result", body);
-                    this.results = {};
-
-                    for (const key in body) {
-                        if (Object.hasOwnProperty.call(body, key)) {
-                            const appointments = body[key];
-                            
-                            for (const appointment of appointments) {
-                                let date = dayjs.utc(appointment.datetime).format("YYYY-MM-DD");
-
-                                if (this.results[date] == null) {
-                                    this.results[date] = [];
-                                }
-
-                                this.results[date].push({
-                                    meeting_point: findMeetingPointName(key),
-                                    datetime: appointment.datetime,
-                                    callback_url: appointment.callback_url
-                                })
-                            }
-                        }
-                    }
-                })
-                .catch(function (error) {
-                    console.error(error);
-                });
-            }
-        }
-    }
-</script>
-
 <template>
     <div>
         <form v-on:submit="submit" class="ng-untouched ng-pristine ng-invalid">
@@ -133,3 +70,71 @@
         <RdvResults v-if="results != null && Object.keys(results).length > 0" :results="results" :start_date="start_date" :end_date="end_date"/>
     </div>
 </template>
+
+<script setup>
+    import RdvResults from './RdvResults.vue'
+    import {DsfrButton} from '@gouvminint/vue-dsfr'
+    import {findMeetingPointName, getAvailableTimeSlots} from '../utils'
+</script>
+
+<script>
+    export default {
+        data() {
+            return {
+                start_date: "",
+                end_date: "",
+                reason: "CNI",
+                documents_number: 1,
+                results: null,
+                dayjs: dayjs
+            }
+        },
+        methods: {
+            search: function(e) {
+                e.preventDefault();
+
+                getAvailableTimeSlots(this.start_date, this.end_date, this.reason, this.documents_number)
+                .then(response => {
+                    return response.json();
+                })
+                .then(body => {
+                    console.log("Result", body);
+                    let results = {};
+
+                    for (const key in body) {
+                        if (Object.hasOwnProperty.call(body, key)) {
+                            const appointments = body[key];
+                            
+                            for (const appointment of appointments) {
+                                let date = dayjs.utc(appointment.datetime).format("YYYY-MM-DD");
+
+                                if (results[date] == null) {
+                                    results[date] = [];
+                                }
+
+                                results[date].push({
+                                    meeting_point: findMeetingPointName(key),
+                                    datetime: appointment.datetime,
+                                    callback_url: appointment.callback_url
+                                })
+                            }
+                        }
+                    }
+
+                    for (const key in results) {
+                        if (Object.hasOwnProperty.call(results, key)) {
+                            results[key] = results[key].sort((a,b) => (a.datetime > b.datetime) ? 1 : (a.datetime < b.datetime) ? -1 : 0);      
+                            console.log(results[key]);                      
+                        }
+                    }
+
+                    this.results = results;
+                })
+                .catch(function (error) {
+                    console.error(error);
+                });
+            }
+        }
+    }
+</script>
+
